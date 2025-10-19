@@ -62,7 +62,7 @@ This approach treats the input as a sequence of "runs" or "groups" of identical 
 - Slightly more complex than simple state tracking
 - The grouping step adds cognitive overhead
 
-Perfect for when you want to match the mental model of typing, or when you need to preprocess input into logical chunks. It's like parsing before evaluating.
+Good for when you want to match the mental model of typing or when you need to preprocess input into logical chunks. Like parsing before evaluating.
 
 ## Getting Started
 
@@ -99,21 +99,21 @@ Console.WriteLine(result); // Output: HELLO
 
 ## Test Coverage
 
-This project includes 45+ comprehensive unit tests covering:
+This project includes 45+ unit tests covering:
 
 - All provided examples
 - Edge cases (empty input, multiple backspaces, excessive spaces)
 - Single character decoding for all keys
-- **Grouping-specific tests** (consecutive digits, group separation, complex grouping patterns)
+- Grouping-specific tests - consecutive digits, group separation, complex patterns
 - Cycling behavior (pressing a key more times than it has letters)
 - Pause handling (spaces between same-key presses)
 - Backspace operations within and between groups
 - Special keys (symbols on key 1, space on key 0)
-- Complex real-world scenarios (SOS, HELLO WORLD, CAT, etc.)
+- Complex real-world scenarios like SOS, HELLO WORLD, CAT
 - Error handling (null input, missing send character)
-- Stress tests (long inputs, long groups, repeated patterns, alternating digits)
+- Stress tests with long inputs, long groups, repeated patterns and alternating digits
 
-The grouping approach excels particularly in tests involving repeated patterns and explicit group boundaries.
+The grouping approach works well for tests involving repeated patterns and explicit group boundaries.
 
 ## Project Structure
 
@@ -123,7 +123,7 @@ OldPhonePad-Grouping/
 │   ├── OldPhonePad.cs                    # Grouping decoder implementation
 │   └── OldPhonePad.Grouping.csproj
 ├── tests/
-│   ├── OldPhonePadTests.cs              # Comprehensive test suite
+│   ├── OldPhonePadTests.cs              # Test suite
 │   └── OldPhonePad.Grouping.Tests.csproj
 ├── .github/
 │   └── workflows/
@@ -181,7 +181,7 @@ Result: "HELLO"
 
 ## Extensions & Ideas
 
-The grouping structure makes certain extensions particularly natural:
+The grouping structure makes some extensions pretty natural:
 
 - Implement parallel group processing for very long inputs
 - Add group visualization/debugging output
@@ -189,18 +189,18 @@ The grouping structure makes certain extensions particularly natural:
 - Build a reverse encoder with automatic space insertion
 - Add regex-based group validation
 - Implement group-based undo (undo last group)
-- Create animated typing visualization showing groups forming
-- Add group statistics (avg group length, most common groups)
+- Animated typing visualization showing groups forming
+- Group statistics like avg group length or most common groups
 
 ## Alternatives
 
-If you enjoyed this approach, check out my other implementations:
+Check out my other implementations:
 - **OldPhonePad-DictionaryState**: Simple dictionary with manual state tracking
 - **OldPhonePad-FSM**: Finite state machine with formal state transitions
 - **OldPhonePad-OOP**: Object-oriented design with separate classes
 - **OldPhonePad-RegexStack**: Regex preprocessing with stack-based evaluation
 
-Each explores different ways to think about the same problem.
+Each explores different ways to solve the same problem.
 
 ## Contributing
 
@@ -210,7 +210,7 @@ Please follow standard C# conventions and include tests for any new functionalit
 
 ## License
 
-MIT License - see LICENSE file for details. Use it, modify it, regroup it. Just remember: every pause between taps was a conscious choice back in the day.
+MIT License - see LICENSE file for details. Use it, modify it, regroup it. Remember: every pause between taps was a conscious choice back in the day.
 
 ## Acknowledgments
 
