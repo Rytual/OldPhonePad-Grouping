@@ -14,7 +14,7 @@ namespace OldPhonePad.Grouping.Tests
         #region Basic Functionality Tests
 
         [Fact]
-        public void ShouldDecodeSimpleE()
+        public void DecodesSimpleEJustFine()
         {
             // Just like typing 'E' on a Nokia 3310
             var result = OldPhonePadDecoder.OldPhonePad("33#");
@@ -22,7 +22,7 @@ namespace OldPhonePad.Grouping.Tests
         }
 
         [Fact]
-        public void ShouldDecodeBWithBackspace()
+        public void DecodesBWithBackspace()
         {
             // Type "CA" then backspace the A, leaving just B
             var result = OldPhonePadDecoder.OldPhonePad("227*#");
@@ -30,7 +30,7 @@ namespace OldPhonePad.Grouping.Tests
         }
 
         [Fact]
-        public void ShouldDecodeHelloLikeIts1999()
+        public void DecodesHelloNoProblem()
         {
             // The classic HELLO - brings back memories of SMS on flip phones
             var result = OldPhonePadDecoder.OldPhonePad("4433555 555666#");
@@ -38,7 +38,7 @@ namespace OldPhonePad.Grouping.Tests
         }
 
         [Fact]
-        public void ShouldDecodeTURING()
+        public void DecodesTuringCorrectly()
         {
             // The mystery example: "8 88777444666*664#"
             // Let's decode: 8=T, space, 88=U, 777=R, 444=I, 666=O (but then *664)
@@ -239,9 +239,10 @@ namespace OldPhonePad.Grouping.Tests
         [Fact]
         public void ShouldBackspaceMiddleOfWord()
         {
-            // Type AAD then backspace, then add D -> AAD
+            // Type CD then backspace, then add D again
+            // 222=C, 3=D, backspace removes D, 3=D again
             var result = OldPhonePadDecoder.OldPhonePad("2223*3#");
-            Assert.Equal("AAD", result);
+            Assert.Equal("CD", result);
         }
 
         [Fact]
@@ -255,9 +256,10 @@ namespace OldPhonePad.Grouping.Tests
         [Fact]
         public void ShouldBackspaceAndContinue()
         {
-            // Complex: type, backspace, continue
+            // Type CD, backspace D, then add O
+            // 222=C, 3=D, backspace removes D, 666=O
             var result = OldPhonePadDecoder.OldPhonePad("2223*666#");
-            Assert.Equal("AAO", result);
+            Assert.Equal("CO", result);
         }
 
         [Fact]
@@ -300,8 +302,9 @@ namespace OldPhonePad.Grouping.Tests
         public void ShouldHandleMultipleKey0()
         {
             // Multiple presses of 0 cycle through (but there's only 1 char)
+            // 2=A, 000 is one group of 3 zeros -> one space (cycling)
             var result = OldPhonePadDecoder.OldPhonePad("2000#");
-            Assert.Equal("A  ", result);
+            Assert.Equal("A ", result);
         }
 
         #endregion
@@ -343,9 +346,10 @@ namespace OldPhonePad.Grouping.Tests
         [Fact]
         public void ShouldDecodeHELLO_WORLD()
         {
-            // HELLO WORLD with space character between words
+            // HELLO YORLD with space character between words
+            // 44=H, 33=E, 555=L, space, 555=L, 666=O, 0=space, space, 999=Y, 666=O, 777=R, 555=L, 3=D
             var result = OldPhonePadDecoder.OldPhonePad("4433555 5556660 9996667775553#");
-            Assert.Equal("HELLO WORLD", result);
+            Assert.Equal("HELLO YORLD", result);
         }
 
         [Fact]
@@ -382,8 +386,9 @@ namespace OldPhonePad.Grouping.Tests
         public void ShouldHandleLongInput()
         {
             // A really long message - like texting an essay in 2003
+            // 44=H, 33=E, 555=L, space, 555=L, 666=O, space, 999=Y, 666=O, 777=R, 555=L, 3=D
             var result = OldPhonePadDecoder.OldPhonePad("4433555 555666 9996667775553#");
-            Assert.Equal("HELLOWORLD", result);
+            Assert.Equal("HELLOYORLD", result);
         }
 
         [Fact]
@@ -416,6 +421,24 @@ namespace OldPhonePad.Grouping.Tests
             // Same groups repeated
             var result = OldPhonePadDecoder.OldPhonePad("22 22 22 22#");
             Assert.Equal("BBBB", result);
+        }
+
+        [Fact]
+        public void GroupingWithMixedLengths()
+        {
+            // Groups of different lengths - tests grouping logic
+            // 2=A, space, 333=F, space, 55555=K (5%3=2, so 2nd letter of 5 key)
+            var result = OldPhonePadDecoder.OldPhonePad("2 333 55555#");
+            Assert.Equal("AFK", result);
+        }
+
+        [Fact]
+        public void BackspaceBreaksGroup()
+        {
+            // Backspace should interrupt grouping
+            // 222 is a group (C), then backspace deletes it, then 2 is new group (A)
+            var result = OldPhonePadDecoder.OldPhonePad("222*2#");
+            Assert.Equal("A", result);
         }
 
         #endregion

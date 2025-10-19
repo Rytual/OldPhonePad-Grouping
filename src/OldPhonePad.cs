@@ -109,6 +109,7 @@ namespace OldPhonePad.Grouping
 
         /// <summary>
         /// Extracts a group of consecutive identical characters starting at the given position.
+        /// Took a bit to get the grouping logic clean
         /// </summary>
         private static string ExtractGroup(string input, int startIndex)
         {
@@ -167,7 +168,7 @@ namespace OldPhonePad.Grouping
                 return '\0';
             }
 
-            // Use modulo to cycle through available characters
+            // Had to figure out cycling here - modulo handles the wraparound
             // This handles the case where you press more times than there are letters
             int index = (presses - 1) % chars.Length;
             return char.ToUpper(chars[index]);

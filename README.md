@@ -14,15 +14,11 @@
 '-------------------'
 ```
 
-## The Rhythm of Repetition
-
-I remember developing a muscle memory for texting back in high school. You'd tap-tap-tap in rapid succession for one letter, pause slightly, then tap-tap-tap again for the next. It was all about the rhythm - the grouping of taps separated by tiny pauses. This implementation captures that exact mental model: identify the groups, decode each group.
-
-This decoder solves the classic old phone keypad challenge using a **grouping approach** that clusters consecutive identical digits before processing them.
-
 ## The Challenge
 
-Decode old phone keypad input into readable text. The keypad layout:
+This approach tackles the keypad problem by grouping consecutive identical digits before decoding. The idea is to identify "runs" of the same key press and treat each run as a single character.
+
+The keypad layout:
 
 ```
 1: &'(        2: abc       3: def
@@ -38,38 +34,35 @@ Decode old phone keypad input into readable text. The keypad layout:
 - `4433555 555666#` → `HELLO`
 - `8 88777444666*664#` → `TURING`
 
-## Why Grouping?
+## My Approach
 
-This approach treats the input as a sequence of "runs" or "groups" of identical characters. Each group represents a single output character, with the group length determining which character in the key's sequence to output.
+I went with a grouping strategy - scan through the input, identify consecutive identical digits, count them, and decode. The grouping part felt natural since that's how you actually type on these keypads.
 
 **How it works:**
-1. Scan through the input
-2. Identify consecutive identical digits (a "group")
-3. Count the length of each group
-4. Use modulo arithmetic to map group length → character
+1. Scan through input character by character
+2. When you hit a digit, collect all consecutive identical digits
+3. Count the group length
+4. Use modulo to map length to character
 5. Spaces break groups, allowing same-key repeats
 
-**Pros:**
-- Intuitive mental model (matches how we actually typed)
-- Clean separation between grouping and decoding logic
-- Easy to visualize and debug (see the groups explicitly)
-- Naturally handles the pause/space behavior
-- Can leverage regex for elegant grouping (optional)
+**What works well:**
+- Intuitive - matches how you actually think about typing
+- Clean separation between grouping and decoding
+- Easy to visualize and debug
+- Naturally handles spaces as group separators
 
-**Cons:**
-- Requires scanning/grouping before decoding (not true single-pass)
-- Backspace handling breaks the pure grouping model
+**What's a bit clunky:**
+- Not a true single-pass algorithm (need to identify groups first)
+- Backspace breaks the pure grouping model
 - Slightly more complex than simple state tracking
-- The grouping step adds cognitive overhead
 
-Good for when you want to match the mental model of typing or when you need to preprocess input into logical chunks. Like parsing before evaluating.
+Works okay when you want to match the mental model of typing or need to preprocess input into chunks. Check out the DictionaryState version if you want something simpler.
 
 ## Getting Started
 
 ### Prerequisites
 
 - .NET 8.0 or later
-- An appreciation for patterns and rhythm
 
 ### Running the Code
 
@@ -78,10 +71,8 @@ Good for when you want to match the mental model of typing or when you need to p
 git clone https://github.com/yourusername/OldPhonePad-Grouping.git
 cd OldPhonePad-Grouping
 
-# Build the project
+# Build and test
 dotnet build
-
-# Run tests
 dotnet test
 
 # For verbose test output
@@ -99,47 +90,28 @@ Console.WriteLine(result); // Output: HELLO
 
 ## Test Coverage
 
-This project includes 45+ unit tests covering:
-
+The project has 45+ tests covering:
 - All provided examples
-- Edge cases (empty input, multiple backspaces, excessive spaces)
+- Edge cases (empty input, backspaces, spaces)
 - Single character decoding for all keys
-- Grouping-specific tests - consecutive digits, group separation, complex patterns
-- Cycling behavior (pressing a key more times than it has letters)
-- Pause handling (spaces between same-key presses)
+- Grouping-specific tests (consecutive digits, group separation, patterns)
+- Cycling behavior
+- Pause handling
 - Backspace operations within and between groups
-- Special keys (symbols on key 1, space on key 0)
-- Complex real-world scenarios like SOS, HELLO WORLD, CAT
-- Error handling (null input, missing send character)
-- Stress tests with long inputs, long groups, repeated patterns and alternating digits
+- Special keys
+- Complex scenarios like SOS, HELLO WORLD, CAT
+- Error handling
+- Stress tests with long groups, repeated patterns, alternating digits
 
-The grouping approach works well for tests involving repeated patterns and explicit group boundaries.
-
-## Project Structure
-
-```
-OldPhonePad-Grouping/
-├── src/
-│   ├── OldPhonePad.cs                    # Grouping decoder implementation
-│   └── OldPhonePad.Grouping.csproj
-├── tests/
-│   ├── OldPhonePadTests.cs              # Test suite
-│   └── OldPhonePad.Grouping.Tests.csproj
-├── .github/
-│   └── workflows/
-│       └── dotnet.yml                    # CI/CD pipeline
-├── .gitignore
-├── LICENSE
-└── README.md
-```
+The grouping approach makes it easy to test pattern-based scenarios.
 
 ## Implementation Details
 
-The grouping algorithm works in two phases:
+The grouping algorithm works in phases:
 
 **Phase 1: Group Extraction**
 ```csharp
-// Extract consecutive identical digits
+// Identify consecutive identical digits
 "222 2 22" → groups: ["222", "2", "22"]
 ```
 
@@ -152,14 +124,10 @@ The grouping algorithm works in two phases:
 Result: "CAB"
 ```
 
-The implementation includes two variants:
-- **Iterative grouping**: Manual character-by-character scanning
-- **Regex grouping**: Uses pattern matching for more functional style
-
 Special handling:
-- Spaces act as group separators (reset grouping)
+- Spaces act as group separators
 - Backspaces interrupt grouping and delete from output
-- Different digit = new group starts
+- Different digit starts a new group
 
 ## Visual Example
 
@@ -179,48 +147,42 @@ Decoding phase:
 Result: "HELLO"
 ```
 
-## Extensions & Ideas
+## Project Structure
 
-The grouping structure makes some extensions pretty natural:
+```
+OldPhonePad-Grouping/
+├── src/
+│   ├── OldPhonePad.cs                    # Grouping decoder
+│   └── OldPhonePad.Grouping.csproj
+├── tests/
+│   ├── OldPhonePadTests.cs              # Test suite
+│   └── OldPhonePad.Grouping.Tests.csproj
+├── .github/
+│   └── workflows/
+│       └── dotnet.yml                    # CI/CD
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
-- Implement parallel group processing for very long inputs
-- Add group visualization/debugging output
-- Create a "group optimizer" that suggests minimal keypresses
-- Build a reverse encoder with automatic space insertion
-- Add regex-based group validation
-- Implement group-based undo (undo last group)
-- Animated typing visualization showing groups forming
-- Group statistics like avg group length or most common groups
+## Other Implementations
 
-## Alternatives
-
-Check out my other implementations:
+Check out the other approaches:
 - **OldPhonePad-DictionaryState**: Simple dictionary with manual state tracking
 - **OldPhonePad-FSM**: Finite state machine with formal state transitions
 - **OldPhonePad-OOP**: Object-oriented design with separate classes
 - **OldPhonePad-RegexStack**: Regex preprocessing with stack-based evaluation
 
-Each explores different ways to solve the same problem.
+Each has different tradeoffs.
 
-## Contributing
+## Fun Note
 
-Found a bug? Have an improvement? Feel free to open an issue or submit a pull request. The grouping structure should make it easy to add new preprocessing steps or alternative grouping strategies.
-
-Please follow standard C# conventions and include tests for any new functionality.
+The grouping logic took a bit to get right - figuring out when to break groups and how to handle backspaces within groups. At first I tried regex for the grouping part, but manual scanning ended up being clearer. The visual aspect helps a lot when debugging - you can literally see the groups forming.
 
 ## License
 
-MIT License - see LICENSE file for details. Use it, modify it, regroup it. Remember: every pause between taps was a conscious choice back in the day.
-
-## Acknowledgments
-
-- Iron Software for the coding challenge that inspired this grouping exploration
-- Everyone who ever counted tap-tap-tap-pause-tap-tap in their head while texting
-- The designers who figured out that pauses could separate same-key letters
-- Nokia, for phones with such satisfying tactile keypads you could text blindfolded
+MIT License - see LICENSE file for details.
 
 ---
 
-Built with pattern recognition and a deep appreciation for chunking. Remember: the fastest T9 texters didn't think about individual letters - they thought in groups.
-
-*Last updated: October 2025*
+*Built for the Iron Software coding challenge - October 2025*
